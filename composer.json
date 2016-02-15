@@ -1,0 +1,17 @@
+{
+    "name": "alsbury/malice",
+    "description": "Codeception fixtures module",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "David Alsbury",
+            "email": "david@alsbury.com"
+        }
+    ],
+    "autoload":{
+        "psr-4":{
+            "Alsbury\\Malice\\": "src"
+        }
+    },
+    "require": {}
+}
