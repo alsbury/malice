@@ -1,6 +1,6 @@
 {
     "name": "alsbury/malice",
-    "description": "Codeception fixtures module",
+    "description": "Symfony bundle and Codeception fixtures module",
     "license": "MIT",
     "authors": [
         {
@@ -8,10 +8,16 @@
             "email": "david@alsbury.com"
         }
     ],
-    "autoload":{
-        "psr-4":{
-            "Alsbury\\Malice\\": "src"
-        }
+    "require": {
+        "php": ">=5.4.0",
+        "nelmio/alice": "~2.1",
+        "symfony/finder": "^2.7|~3.0"
     },
-    "require": {}
+    "require-dev": {
+        "hautelook/alice-bundle":"~1.2.0"
+    },
+    "autoload": {
+        "psr-4": { "Alsbury\\MaliceBundle\\": "src" }
+    }
+
 }
