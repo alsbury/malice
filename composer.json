@@ -17,7 +17,7 @@
         "hautelook/alice-bundle":"~1.2.0"
     },
     "autoload": {
-        "psr-4": { "Alsbury\\MaliceBundle\\": "src" }
+        "psr-4": { "Alsbury\\Malice\\": "src" }
     }
 
 }
