@@ -3,11 +3,10 @@
 namespace Alsbury\Malice\Component\Codeception\Module;
 
 use Alsbury\Malice\Component\Codeception\TestCaseInterface;
-use Alsbury\Malice\Fixtures\FixtureConfig;
+use Alsbury\Malice\Component\Fixtures\FixtureConfig;
 use Codeception\Module as CodeceptionModule;
 use Codeception\TestCase;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Tools\SchemaTool;
 use Hautelook\AliceBundle\Alice\DataFixtures\Loader;
 use Hautelook\AliceBundle\Doctrine\DataFixtures\Executor\FixturesExecutor;
@@ -238,14 +237,9 @@ class Malice extends CodeceptionModule
             /** @var FixtureConfig $fixtureConfig */
             $fixtureConfig = $test->getFixtureConfig();
             $configResolver = $this->getContainer()->get('alsbury.malice.fixture_config_resolver');
-            $fixtures = $configResolver->getFixtures($fixtureConfig);
-//            print_r($fixtures); die();
+            $fixtures = $configResolver->getFixtures(($fixtureConfig === null ? new FixtureConfig() : $fixtureConfig));
             $this->loadFixtures($fixtures);
         }
-
-//        if ($this->config['drop_create']) {
-//            $this->emptyDatabase();
-//        }
     }
 
     public function _after(TestCase $test)

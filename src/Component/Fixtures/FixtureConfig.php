@@ -18,7 +18,7 @@ class FixtureConfig
      * FixtureConfig constructor.
      * @param array $config
      */
-    public function __construct(array $config)
+    public function __construct(array $config = [])
     {
         if (isset($config['bundles'])) {
             $this->setBundles($config['bundles']);

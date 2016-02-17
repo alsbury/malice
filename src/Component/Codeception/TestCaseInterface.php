@@ -7,7 +7,7 @@ use Alsbury\Malice\Fixtures\FixtureConfig;
 interface TestCaseInterface
 {
     /**
-     * @return FixtureConfig
+     * @return FixtureConfig|null
      */
     public function getFixtureConfig();
 }
