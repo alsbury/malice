@@ -18,7 +18,6 @@ use Symfony\Component\Console\Output\StreamOutput;
 
 class Malice extends CodeceptionModule
 {
-
     /**
      * @var EntityManager
      */
@@ -51,7 +50,9 @@ class Malice extends CodeceptionModule
 
     protected $classes;
 
-    protected $fixtureConfig;
+    protected $container;
+
+    protected $fixtures;
 
     /**
      * @var BundlesResolverInterface
@@ -68,177 +69,26 @@ class Malice extends CodeceptionModule
         $module = $this->getModule('Symfony2');
 
         /** @var \AppKernel $kernel */
-        $this->setKernel($module->kernel);
-
-        $this->setEntityManager($this->getContainer()->get('doctrine.orm.entity_manager'));
-        $this->setFixturesFinder($this->getContainer()->get('hautelook_alice.doctrine.orm.fixtures_finder'));
-        $this->setFixturesLoader($this->getContainer()->get('hautelook_alice.fixtures.loader'));
-        $this->setFixturesExecutor($this->getContainer()->get('hautelook_alice.doctrine.executor.fixtures_executor'));
-        $this->setBundleResolver($this->getContainer()->get('hautelook_alice.bundle_resolver'));
-        $this->setSchemaTool(new SchemaTool($this->getEntityManager()));
-    }
-
-    /**
-     * @return EntityManager
-     */
-    public function getEntityManager()
-    {
-        return $this->entityManager;
-    }
-
-    /**
-     * @param EntityManager $entityManager
-     * @return Malice
-     */
-    public function setEntityManager($entityManager)
-    {
-        $this->entityManager = $entityManager;
-        return $this;
-    }
-
-    /**
-     * @return FixturesFinder
-     */
-    public function getFixturesFinder()
-    {
-        return $this->fixturesFinder;
-    }
-
-    /**
-     * @param FixturesFinder $fixturesFinder
-     * @return Malice
-     */
-    public function setFixturesFinder($fixturesFinder)
-    {
-        $this->fixturesFinder = $fixturesFinder;
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getFixturesLoader()
-    {
-        return $this->fixturesLoader;
-    }
-
-    /**
-     * @param mixed $fixturesLoader
-     * @return Malice
-     */
-    public function setFixturesLoader($fixturesLoader)
-    {
-        $this->fixturesLoader = $fixturesLoader;
-        return $this;
-    }
-
-    /**
-     * @return FixturesExecutor
-     */
-    public function getFixturesExecutor()
-    {
-        return $this->fixturesExecutor;
-    }
-
-    /**
-     * @param FixturesExecutor $fixturesExecutor
-     * @return Malice
-     */
-    public function setFixturesExecutor($fixturesExecutor)
-    {
-        $this->fixturesExecutor = $fixturesExecutor;
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getKernel()
-    {
-        return $this->kernel;
-    }
-
-    /**
-     * @param mixed $kernel
-     * @return Malice
-     */
-    public function setKernel($kernel)
-    {
-        $this->kernel = $kernel;
-        return $this;
-    }
-
-    /**
-     * @return SchemaTool
-     */
-    public function getSchemaTool()
-    {
-        return $this->schemaTool;
-    }
-
-    /**
-     * @param SchemaTool $schemaTool
-     * @return Malice
-     */
-    public function setSchemaTool($schemaTool)
-    {
-        $this->schemaTool = $schemaTool;
-        return $this;
-    }
-
-    /**
-     * @return BundlesResolverInterface
-     */
-    public function getBundleResolver()
-    {
-        return $this->bundleResolver;
-    }
-
-    /**
-     * @param BundlesResolverInterface $bundleResolver
-     * @return Malice
-     */
-    public function setBundleResolver($bundleResolver)
-    {
-        $this->bundleResolver = $bundleResolver;
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getFixtureConfig()
-    {
-        return $this->fixtureConfig;
-    }
-
-    /**
-     * @param mixed $fixtureConfig
-     * @return Malice
-     */
-    public function setFixtureConfig($fixtureConfig)
-    {
-        $this->fixtureConfig = $fixtureConfig;
-        return $this;
-    }
-
-    /**
-     * @return \Symfony\Component\DependencyInjection\ContainerInterface
-     * @throws \Codeception\Exception\ModuleException
-     */
-    public function getContainer()
-    {
-        return $this->getKernel()->getContainer();
+        $this->kernel = $module->kernel;
+        $this->container = $kernel->getContainer();
+        $this->entityManager = $this->container->get('doctrine.orm.entity_manager');
+        $this->fixturesFinder = $this->container->get('hautelook_alice.doctrine.orm.fixtures_finder');
+        $this->fixturesLoader = $this->container->get('hautelook_alice.fixtures.loader');
+        $this->fixturesExecutor = $this->container->get('hautelook_alice.doctrine.executor.fixtures_executor');
+        $this->bundleResolver = $this->container->get('hautelook_alice.bundle_resolver');
+        $this->schemaTool = new SchemaTool($this->entityManager);
     }
 
     public function _before(TestCase $test)
     {
         if ($test instanceof TestCaseInterface) {
-            /** @var FixtureConfig $fixtureConfig */
-            $fixtureConfig = $test->getFixtureConfig();
-            $configResolver = $this->getContainer()->get('alsbury.malice.fixture_config_resolver');
-            $fixtures = $configResolver->getFixtures(($fixtureConfig === null ? new FixtureConfig() : $fixtureConfig));
-            $this->loadFixtures($fixtures);
+            if ($this->fixtures === null) {
+                /** @var FixtureConfig $fixtureConfig */
+                $fixtureConfig = $test->getFixtureConfig();
+                $configResolver = $this->container->get('alsbury.malice.fixture_config_resolver');
+                $this->fixtures = $configResolver->getFixtures(($fixtureConfig === null ? new FixtureConfig() : $fixtureConfig));
+            }
+            $this->loadFixtures($this->fixtures);
         }
     }
 
@@ -249,42 +99,26 @@ class Malice extends CodeceptionModule
 
     public function loadFixtures($fixtures)
     {
-        $this->getFixturesExecutor()
-            ->execute($this->getEntityManager(), $this->getFixturesLoader(), $fixtures, false, null);
-    }
-
-    public function executeFixtureCommand()
-    {
-        $container = $this->getContainer();
-        $kernel = $container->get('kernel');
-        $app = new Application($kernel);
-
-        $input = new StringInput('hautelook_alice:doctrine:fixtures:load');
-        $input->setInteractive(false);
-        $output = new StreamOutput(fopen('php://memory', 'w'));
-
-        $app->doRun($input, $output);
-
-        $em = $container->get('doctrine.orm.entity_manager');
-        $em->flush();
+        $this->fixturesExecutor
+            ->execute($this->entityManager, $this->fixturesLoader, $fixtures, false, null);
     }
 
     public function getSchemaClasses()
     {
         if (!$this->classes) {
-            $this->classes = $this->getEntityManager()->getMetadataFactory()->getAllMetadata();
+            $this->classes = $this->entityManager->getMetadataFactory()->getAllMetadata();
         }
         return $this->classes;
     }
 
     public function createSchema()
     {
-        $this->getSchemaTool()->createSchema($this->getSchemaClasses());
+        $this->schemaTool->createSchema($this->getSchemaClasses());
     }
 
     public function dropSchema()
     {
-        $this->getSchemaTool()->dropSchema($this->getSchemaClasses());
+        $this->schemaTool->dropSchema($this->getSchemaClasses());
     }
 
     public function emptyDatabase()
