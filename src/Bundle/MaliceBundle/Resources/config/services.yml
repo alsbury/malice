@@ -1,0 +1,4 @@
+services:
+  alsbury.malice.fixture_config_resolver:
+    class: Alsbury\Malice\Component\Fixtures\FixtureConfigResolver
+    arguments: [ "@kernel", "@hautelook_alice.bundle_resolver", "@hautelook_alice.doctrine.orm.fixtures_finder" ]
