@@ -15,6 +15,7 @@ use Hautelook\AliceBundle\Resolver\BundlesResolverInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\DependencyInjection\Container;
 
 class Malice extends CodeceptionModule
 {
@@ -48,10 +49,20 @@ class Malice extends CodeceptionModule
      */
     protected $schemaTool;
 
-    protected $classes;
+    /**
+     * @var mixed
+     */
+    protected $schemaMetaData;
 
+    /**
+     * @var Container
+     */
     protected $container;
 
+    /**
+     * Array of fixture files to load
+     * @var array
+     */
     protected $fixtures;
 
     /**
@@ -70,7 +81,7 @@ class Malice extends CodeceptionModule
 
         /** @var \AppKernel $kernel */
         $this->kernel = $module->kernel;
-        $this->container = $kernel->getContainer();
+        $this->container = $this->kernel->getContainer();
         $this->entityManager = $this->container->get('doctrine.orm.entity_manager');
         $this->fixturesFinder = $this->container->get('hautelook_alice.doctrine.orm.fixtures_finder');
         $this->fixturesLoader = $this->container->get('hautelook_alice.fixtures.loader');
@@ -81,6 +92,11 @@ class Malice extends CodeceptionModule
 
     public function _before(TestCase $test)
     {
+
+        if ($this->config['drop_create'] === true) {
+            $this->emptyDatabase();
+        }
+
         if ($test instanceof TestCaseInterface) {
             if ($this->fixtures === null) {
                 /** @var FixtureConfig $fixtureConfig */
@@ -105,10 +121,10 @@ class Malice extends CodeceptionModule
 
     public function getSchemaClasses()
     {
-        if (!$this->classes) {
-            $this->classes = $this->entityManager->getMetadataFactory()->getAllMetadata();
+        if (!$this->schemaMetaData) {
+            $this->schemaMetaData = $this->entityManager->getMetadataFactory()->getAllMetadata();
         }
-        return $this->classes;
+        return $this->schemaMetaData;
     }
 
     public function createSchema()
