@@ -92,20 +92,21 @@ class Malice extends CodeceptionModule
 
     public function _before(TestCase $test)
     {
-        $modules = $this->getModules();
+        codecept_debug("Malice running before");
         if ($this->config['drop_create'] === true) {
             $this->emptyDatabase();
         }
 
         if ($test instanceof TestCaseInterface) {
+            codecept_debug("Test implements TestCaseInterface");
             if ($this->fixtures === null) {
                 /** @var FixtureConfig $fixtureConfig */
                 $fixtureConfig = $test->_getFixtureConfig();
-                $configResolver = $this->container->get('alsbury.malice.fixture_config_resolver');
-                $this->fixtures = $configResolver->getFixtures(($fixtureConfig === null ? new FixtureConfig() : $fixtureConfig));
             }
-            $this->loadFixtures($this->fixtures);
         }
+        $configResolver = $this->container->get('alsbury.malice.fixture_config_resolver');
+        $this->fixtures = $configResolver->getFixtures(new FixtureConfig());
+        $this->loadFixtures($this->fixtures);
     }
 
     public function _after(TestCase $test)
@@ -115,6 +116,7 @@ class Malice extends CodeceptionModule
 
     public function loadFixtures($fixtures)
     {
+        codecept_debug("Loading fixtures");
         $this->fixturesExecutor
             ->execute($this->entityManager, $this->fixturesLoader, $fixtures, false, null);
     }
@@ -129,16 +131,19 @@ class Malice extends CodeceptionModule
 
     public function createSchema()
     {
+        codecept_debug("Creating schema");
         $this->schemaTool->createSchema($this->getSchemaClasses());
     }
 
     public function dropSchema()
     {
+        codecept_debug("Dropping schema");
         $this->schemaTool->dropSchema($this->getSchemaClasses());
     }
 
     public function emptyDatabase()
     {
+        codecept_debug("Empty database");
         $this->dropSchema();
         $this->createSchema();
     }
