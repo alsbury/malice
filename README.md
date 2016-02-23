@@ -41,7 +41,7 @@ Example test that loads fixtures defined in MyBundle:
         /**
          * @return FixtureConfig
          */
-        public function getFixtureConfig()
+        public function _getFixtureConfig()
         {
             return new FixtureConfig(['bundles' => [
                 'MyBundle'

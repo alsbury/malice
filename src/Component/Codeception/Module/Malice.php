@@ -92,7 +92,7 @@ class Malice extends CodeceptionModule
 
     public function _before(TestCase $test)
     {
-
+        $modules = $this->getModules();
         if ($this->config['drop_create'] === true) {
             $this->emptyDatabase();
         }
@@ -100,7 +100,7 @@ class Malice extends CodeceptionModule
         if ($test instanceof TestCaseInterface) {
             if ($this->fixtures === null) {
                 /** @var FixtureConfig $fixtureConfig */
-                $fixtureConfig = $test->getFixtureConfig();
+                $fixtureConfig = $test->_getFixtureConfig();
                 $configResolver = $this->container->get('alsbury.malice.fixture_config_resolver');
                 $this->fixtures = $configResolver->getFixtures(($fixtureConfig === null ? new FixtureConfig() : $fixtureConfig));
             }

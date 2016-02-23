@@ -9,5 +9,5 @@ interface TestCaseInterface
     /**
      * @return FixtureConfig|null
      */
-    public function getFixtureConfig();
+    public function _getFixtureConfig();
 }
