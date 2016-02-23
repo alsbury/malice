@@ -2,7 +2,7 @@
 
 namespace Alsbury\Malice\Component\Codeception;
 
-use Alsbury\Malice\Fixtures\FixtureConfig;
+use Alsbury\Malice\Component\Fixtures\FixtureConfig;
 
 interface TestCaseInterface
 {
