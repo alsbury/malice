@@ -142,4 +142,10 @@ class Malice extends CodeceptionModule
         $this->dropSchema();
         $this->createSchema();
     }
+
+    public function getConainter()
+    {
+        return $this->getModule('Symfony2')->kernel->getContainer();
+    }
+
 }
