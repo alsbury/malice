@@ -71,7 +71,7 @@ class Malice extends CodeceptionModule
     protected $bundleResolver;
 
     protected $config = [
-        'drop_create' => true
+        'append' => false
     ];
 
     public function _initialize()
@@ -93,7 +93,8 @@ class Malice extends CodeceptionModule
     public function _before(TestCase $test)
     {
         codecept_debug("Malice running before");
-        if ($this->config['drop_create'] === true) {
+        if ($this->config['append'] === false) {
+            codecept_debug("Empty database");
             $this->emptyDatabase();
         }
 
@@ -110,16 +111,11 @@ class Malice extends CodeceptionModule
         }
     }
 
-    public function _after(TestCase $test)
-    {
-
-    }
-
     public function loadFixtures($fixtures)
     {
         codecept_debug("Loading fixtures");
         $this->fixturesExecutor
-            ->execute($this->entityManager, $this->fixturesLoader, $fixtures, false, null);
+            ->execute($this->entityManager, $this->fixturesLoader, $fixtures, $this->config['append'], null);
     }
 
     public function getSchemaClasses()
