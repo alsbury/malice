@@ -97,16 +97,17 @@ class Malice extends CodeceptionModule
             $this->emptyDatabase();
         }
 
-        if ($test instanceof TestCaseInterface) {
+        if (in_array(TestCaseInterface::class, class_implements(get_class($test->getTestClass())))) {
             codecept_debug("Test implements TestCaseInterface");
             if ($this->fixtures === null) {
                 /** @var FixtureConfig $fixtureConfig */
-                $fixtureConfig = $test->_getFixtureConfig();
+                $configResolver = $this->container->get('alsbury.malice.fixture_config_resolver');
+                $fixtureConfig = $test->getTestClass()->_getFixtureConfig();
+                $this->fixtures = $configResolver->getFixtures($fixtureConfig === null ? new FixtureConfig() : $fixtureConfig);
+                $this->loadFixtures($this->fixtures);
+
             }
         }
-        $configResolver = $this->container->get('alsbury.malice.fixture_config_resolver');
-        $this->fixtures = $configResolver->getFixtures(new FixtureConfig());
-        $this->loadFixtures($this->fixtures);
     }
 
     public function _after(TestCase $test)
