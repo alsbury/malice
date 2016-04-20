@@ -9,11 +9,12 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0",
-        "nelmio/alice": "~2.1",
-        "symfony/finder": "^2.7|~3.0"
+        "php": ">=5.4.0"
     },
     "require-dev": {
+        "nelmio/alice": "~2.1",
+        "symfony/finder": "^2.7|~3.0",
+        "codeception/codeception": "^2.1",
         "hautelook/alice-bundle":"~1.2.0"
     },
     "autoload": {

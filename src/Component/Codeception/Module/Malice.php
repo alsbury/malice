@@ -94,7 +94,6 @@ class Malice extends CodeceptionModule
     {
         codecept_debug("Malice running before");
         if ($this->config['append'] === false) {
-            codecept_debug("Empty database");
             $this->emptyDatabase();
         }
 
@@ -105,9 +104,8 @@ class Malice extends CodeceptionModule
                 $configResolver = $this->container->get('alsbury.malice.fixture_config_resolver');
                 $fixtureConfig = $test->getTestClass()->_getFixtureConfig();
                 $this->fixtures = $configResolver->getFixtures($fixtureConfig === null ? new FixtureConfig() : $fixtureConfig);
-                $this->loadFixtures($this->fixtures);
-
             }
+            $this->loadFixtures($this->fixtures);
         }
     }
 
