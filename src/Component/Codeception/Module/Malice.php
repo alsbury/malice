@@ -121,7 +121,6 @@ class Malice extends CodeceptionModule
     public function getFixturesByAnnotation($test)
     {
         codecept_debug("Registering annotations");
-//        AnnotationRegistry::registerAutoloadNamespace('Alsbury\Malice\Component\Annotation', '../../Annotation');
         AnnotationRegistry::registerFile(
             "/var/www/project/vendor/alsbury/malice/src/Component/Annotation/FixtureAnnotations.php"
         );
