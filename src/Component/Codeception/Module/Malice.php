@@ -6,12 +6,16 @@ use Alsbury\Malice\Component\Codeception\TestCaseInterface;
 use Alsbury\Malice\Component\Fixtures\FixtureConfig;
 use Codeception\Module as CodeceptionModule;
 use Codeception\TestCase;
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
+use Doctrine\Common\Annotations\FileCacheReader;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Hautelook\AliceBundle\Alice\DataFixtures\Loader;
 use Hautelook\AliceBundle\Doctrine\DataFixtures\Executor\FixturesExecutor;
 use Hautelook\AliceBundle\Doctrine\Finder\FixturesFinder;
 use Hautelook\AliceBundle\Resolver\BundlesResolverInterface;
+use ReflectionObject;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\StreamOutput;
@@ -103,10 +107,35 @@ class Malice extends CodeceptionModule
                 /** @var FixtureConfig $fixtureConfig */
                 $configResolver = $this->container->get('alsbury.malice.fixture_config_resolver');
                 $fixtureConfig = $test->getTestClass()->_getFixtureConfig();
+                codecept_debug('Fixture Config:');
+                codecept_debug($fixtureConfig);
                 $this->fixtures = $configResolver->getFixtures($fixtureConfig === null ? new FixtureConfig() : $fixtureConfig);
+                codecept_debug('Fixtures:');
+                codecept_debug($this->fixtures);
+                $newFixtures = $this->getFixturesByAnnotation($test);
             }
             $this->loadFixtures($this->fixtures);
         }
+    }
+
+    public function getFixturesByAnnotation($test)
+    {
+        codecept_debug("Registering annotations");
+//        AnnotationRegistry::registerAutoloadNamespace('Alsbury\Malice\Component\Annotation', '../../Annotation');
+        AnnotationRegistry::registerFile(
+            "/var/www/project/vendor/alsbury/malice/src/Component/Annotation/FixtureAnnotations.php"
+        );
+
+        codecept_debug(get_class($test->getTestClass()));
+        codecept_debug($test->getName());
+
+        $annotationReader = new FileCacheReader(new AnnotationReader(), '.fixture_annotation_cache', $debug = true);
+        $className = get_class($test->getTestClass());
+        $reflectionObject = new ReflectionObject(new $className());
+        $classAnnotations = $annotationReader->getClassAnnotations($reflectionObject);
+        codecept_debug($classAnnotations);
+
+        return $classAnnotations;
     }
 
     public function loadFixtures($fixtures)
