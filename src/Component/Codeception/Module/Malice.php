@@ -3,13 +3,10 @@
 namespace Alsbury\Malice\Component\Codeception\Module;
 
 use Alsbury\Malice\Component\Codeception\TestCaseInterface;
-use Alsbury\Malice\Component\Fixtures\FixtureConfig;
 use Alsbury\Malice\Path;
 use Codeception\Module as CodeceptionModule;
 use Codeception\TestCase;
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\AnnotationRegistry;
-use Doctrine\Common\Annotations\FileCacheReader;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Hautelook\AliceBundle\Alice\DataFixtures\Loader;
@@ -17,9 +14,6 @@ use Hautelook\AliceBundle\Doctrine\DataFixtures\Executor\FixturesExecutor;
 use Hautelook\AliceBundle\Doctrine\Finder\FixturesFinder;
 use Hautelook\AliceBundle\Resolver\BundlesResolverInterface;
 use ReflectionObject;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\DependencyInjection\Container;
 
 class Malice extends CodeceptionModule
@@ -113,22 +107,21 @@ class Malice extends CodeceptionModule
 
     public function getFixturesByAnnotation($test)
     {
-        codecept_debug("Registering annotations");
-        AnnotationRegistry::registerFile(
-            dirname(__FILE__) . "/../../Annotation/Fixture.php"
-        );
         codecept_debug(get_class($test->getTestClass()));
         codecept_debug($test->getName());
 
-        $annotationReader = new FileCacheReader(new AnnotationReader(), '.fixture_annotation_cache', $debug = true);
+        $annotationReader = new AnnotationReader();
         $className = get_class($test->getTestClass());
         $reflectionObject = new ReflectionObject(new $className());
         $classAnnotations = $annotationReader->getClassAnnotations($reflectionObject);
+        codecept_debug($classAnnotations);
 
         foreach ($classAnnotations as $annotation) {
+//            $path = $this->kernel->locateResource('@BillingBundle');
             $fixtures[] = '/var/www/project/application/src/Bundle/' . $annotation->bundle .
                 '/DataFixtures/ORM/' . $annotation->fixture;
         }
+        
         return $fixtures;
     }
 
