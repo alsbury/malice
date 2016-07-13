@@ -107,20 +107,22 @@ class Malice extends CodeceptionModule
 
     public function getFixturesByAnnotation($test)
     {
-        codecept_debug(get_class($test->getTestClass()));
-        codecept_debug($test->getName());
+        codecept_debug("Test class: " . get_class($test->getTestClass()));
+        codecept_debug("Test name: " . $test->getName());
 
         $annotationReader = new AnnotationReader();
         $className = get_class($test->getTestClass());
         $reflectionObject = new ReflectionObject(new $className());
         $classAnnotations = $annotationReader->getClassAnnotations($reflectionObject);
+        codecept_debug("Class annotations:");
         codecept_debug($classAnnotations);
 
         foreach ($classAnnotations as $annotation) {
-//            $path = $this->kernel->locateResource('@BillingBundle');
-            $fixtures[] = '/var/www/project/application/src/Bundle/' . $annotation->bundle .
-                '/DataFixtures/ORM/' . $annotation->fixture;
+            $path = $this->kernel->locateResource('@' . $annotation->bundle);
+            $fixtures[] = $path . '/DataFixtures/ORM/' . $annotation->fixture;
         }
+        codecept_debug("Fixtures:");
+        codecept_debug($fixtures);
         
         return $fixtures;
     }
