@@ -105,18 +105,7 @@ class Malice extends CodeceptionModule
         if (in_array(TestCaseInterface::class, class_implements(get_class($test->getTestClass())))) {
             codecept_debug("Test implements TestCaseInterface");
             if ($this->fixtures === null) {
-                /** @var FixtureConfig $fixtureConfig */
-                $configResolver = $this->container->get('alsbury.malice.fixture_config_resolver');
-                $fixtureConfig = $test->getTestClass()->_getFixtureConfig();
-                codecept_debug('Fixture Config:');
-                codecept_debug($fixtureConfig);
-                $this->fixtures = $configResolver->getFixtures($fixtureConfig === null ? new FixtureConfig() : $fixtureConfig);
-                codecept_debug('Original Fixtures:');
-                codecept_debug($this->fixtures);
-
-                $newFixtures = $this->getFixturesByAnnotation($test);
-                codecept_debug('New Fixtures:');
-                codecept_debug($newFixtures);
+                $this->fixtures = $this->getFixturesByAnnotation($test);
             }
             $this->loadFixtures($this->fixtures);
         }
@@ -126,7 +115,7 @@ class Malice extends CodeceptionModule
     {
         codecept_debug("Registering annotations");
         AnnotationRegistry::registerFile(
-            realpath(dirname(__FILE__) . "/../../Annotation/Fixture.php")
+            dirname(__FILE__) . "/../../Annotation/Fixture.php"
         );
         codecept_debug(get_class($test->getTestClass()));
         codecept_debug($test->getName());
@@ -136,7 +125,11 @@ class Malice extends CodeceptionModule
         $reflectionObject = new ReflectionObject(new $className());
         $classAnnotations = $annotationReader->getClassAnnotations($reflectionObject);
 
-        return $classAnnotations;
+        foreach ($classAnnotations as $annotation) {
+            $fixtures[] = '/var/www/project/application/src/Bundle/' . $annotation->bundle .
+                '/DataFixtures/ORM/' . $annotation->fixture;
+        }
+        return $fixtures;
     }
 
     public function loadFixtures($fixtures)
