@@ -4,6 +4,7 @@ namespace Alsbury\Malice\Component\Codeception\Module;
 
 use Alsbury\Malice\Component\Codeception\TestCaseInterface;
 use Alsbury\Malice\Component\Fixtures\FixtureConfig;
+use Alsbury\Malice\Path;
 use Codeception\Module as CodeceptionModule;
 use Codeception\TestCase;
 use Doctrine\Common\Annotations\AnnotationReader;
@@ -110,9 +111,12 @@ class Malice extends CodeceptionModule
                 codecept_debug('Fixture Config:');
                 codecept_debug($fixtureConfig);
                 $this->fixtures = $configResolver->getFixtures($fixtureConfig === null ? new FixtureConfig() : $fixtureConfig);
-                codecept_debug('Fixtures:');
+                codecept_debug('Original Fixtures:');
                 codecept_debug($this->fixtures);
+
                 $newFixtures = $this->getFixturesByAnnotation($test);
+                codecept_debug('New Fixtures:');
+                codecept_debug($newFixtures);
             }
             $this->loadFixtures($this->fixtures);
         }
@@ -122,9 +126,8 @@ class Malice extends CodeceptionModule
     {
         codecept_debug("Registering annotations");
         AnnotationRegistry::registerFile(
-            "/var/www/project/vendor/alsbury/malice/src/Component/Annotation/FixtureAnnotations.php"
+            realpath(dirname(__FILE__) . "/../../Annotation/Fixture.php")
         );
-
         codecept_debug(get_class($test->getTestClass()));
         codecept_debug($test->getName());
 
@@ -132,7 +135,6 @@ class Malice extends CodeceptionModule
         $className = get_class($test->getTestClass());
         $reflectionObject = new ReflectionObject(new $className());
         $classAnnotations = $annotationReader->getClassAnnotations($reflectionObject);
-        codecept_debug($classAnnotations);
 
         return $classAnnotations;
     }
