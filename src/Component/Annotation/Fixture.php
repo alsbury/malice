@@ -9,6 +9,4 @@ use Doctrine\Common\Annotations\Annotation;
  */
 final class Fixture extends Annotation
 {
-    public $bundle;
-    public $fixture;
 }

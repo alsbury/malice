@@ -118,12 +118,13 @@ class Malice extends CodeceptionModule
         codecept_debug($classAnnotations);
 
         foreach ($classAnnotations as $annotation) {
-            $path = $this->kernel->locateResource('@' . $annotation->bundle);
-            $fixtures[] = $path . '/DataFixtures/ORM/' . $annotation->fixture;
+            $arr = explode(":", $annotation->value, 2);
+            $path = $this->kernel->locateResource('@' . $arr[0]);
+            $fixtures[] = $path . '/DataFixtures/ORM/' . $arr[1];
         }
         codecept_debug("Fixtures:");
         codecept_debug($fixtures);
-        
+
         return $fixtures;
     }
 
