@@ -98,9 +98,8 @@ class Malice extends CodeceptionModule
 
         if (in_array(TestCaseInterface::class, class_implements(get_class($test->getTestClass())))) {
             codecept_debug("Test implements TestCaseInterface");
-            if ($this->fixtures === null) {
-                $this->fixtures = $this->getFixturesByAnnotation($test);
-            }
+            $this->fixtures = null;
+            $this->fixtures = $this->getFixturesByAnnotation($test);
             $this->loadFixtures($this->fixtures);
         }
     }
@@ -112,15 +111,19 @@ class Malice extends CodeceptionModule
 
         $annotationReader = new AnnotationReader();
         $className = get_class($test->getTestClass());
+        $methodName = $test->getName();
         $reflectionObject = new ReflectionObject(new $className());
         $classAnnotations = $annotationReader->getClassAnnotations($reflectionObject);
         codecept_debug("Class annotations:");
         codecept_debug($classAnnotations);
-
-        foreach ($classAnnotations as $annotation) {
+        $methodAnnotations = $annotationReader->getMethodAnnotations($reflectionObject->getMethod($methodName));
+        codecept_debug("Method annotations:");
+        codecept_debug($methodAnnotations);
+        $testAnnotations = array_merge($classAnnotations, $methodAnnotations);
+        foreach ($testAnnotations as $annotation) {
             $arr = explode(":", $annotation->value, 2);
             $path = $this->kernel->locateResource('@' . $arr[0]);
-            $fixtures[] = $path . '/DataFixtures/ORM/' . $arr[1];
+            $fixtures[] = $path . 'DataFixtures/ORM/' . $arr[1];
         }
         codecept_debug("Fixtures:");
         codecept_debug($fixtures);
