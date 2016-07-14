@@ -23,35 +23,40 @@ Add module to codeception test suite YAML file:
         - \Alsbury\Malice\Component\Codeception\Module\Malice:
             drop_create: true
     
-Example test that loads fixtures defined in MyBundle:
+Example test that loads fixtures defined in a bundle, specified by Doctrine annotations:
 
     <?php
     
-    use Alsbury\Malice\Component\Codeception\TestCaseInterface;
-    use Alsbury\Malice\Component\Fixtures\FixtureConfig;
+    use Alsbury\Malice\Component\Annotation\Fixture;
     
-    class AccountCreatorTest extends \Codeception\TestCase\Test implements TestCaseInterface
+    /**
+     * @Fixture("MyBundle:Foo.yml")
+     * @Fixture("MyBundle:Bar.yml")
+     * @Fixture("AnotherBundle:AnotherFoo.yml")
+     */
+    class AccountCreatorTest extends \Codeception\TestCase\Test
     {
-        
+        /**
+         * @Fixture("MyBundle:MethodSpecificFoo.yml")
+         */
         public function testNothing()
         {
             $this->assertEquals(true, true);
         }
     
-        /**
-         * @return FixtureConfig
-         */
-        public function _getFixtureConfig()
+        public function testSomeOtherNothing()
         {
-            return new FixtureConfig(['bundles' => [
-                'MyBundle'
-            ]]);
+            $this->assertEquals(true,true);
         }
     }            
        
-Setup fixtures per the `hautelook/alice-bundle` spec. If your test implements `TestCaseInterface`, Malice bundle will
-attempt to load fixtures defined in FixtureConfig. If however you provide an empty config (new FixtureConfig(), all fixtures in all bundles
-will be loaded. Fixture environments are not currently supported. 
+Setup fixtures per the `hautelook/alice-bundle` spec. Fixtures definition files `Foo.yml` are expected
+to be in the directory `DataFixtures/ORM` in the specific bundle directory. Each fixture needs to have
+its own annotation as noted in the sample above, containing the bundle name, followed by a colon, then the
+fixture yaml file `MyBundle:Foo.yml`. Fixtures annotations for the class will apply to all methods in that
+class. Fixture annotations for a method will be added to the class fixtures for that specific test only.
+
+Fixture environments are not currently supported. 
             
 # Requirements
 
