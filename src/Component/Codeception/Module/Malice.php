@@ -100,7 +100,9 @@ class Malice extends CodeceptionModule
             codecept_debug("Test implements TestCaseInterface");
             $this->fixtures = null;
             $this->fixtures = $this->getFixturesByAnnotation($test);
-            $this->loadFixtures($this->fixtures);
+            if (count($this->fixtures) > 0) {
+                $this->loadFixtures($this->fixtures);
+            }
         }
     }
 
