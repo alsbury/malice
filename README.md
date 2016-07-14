@@ -53,7 +53,7 @@ Example test that loads fixtures defined in a bundle, specified by Doctrine anno
 Setup fixtures per the `hautelook/alice-bundle` spec. Fixtures definition files `Foo.yml` are expected
 to be in the directory `DataFixtures/ORM` in the specific bundle directory. Each fixture needs to have
 its own annotation as noted in the sample above, containing the bundle name, followed by a colon, then the
-fixture yaml file `MyBundle:Foo.yml`. Fixtures annotations for the class will apply to all methods in that
+fixture yaml file `MyBundle:Foo.yml`. Fixture annotations for the class will apply to all methods in that
 class. Fixture annotations for a method will be added to the class fixtures for that specific test only.
 
 Fixture environments are not currently supported. 
