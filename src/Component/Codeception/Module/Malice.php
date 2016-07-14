@@ -118,6 +118,9 @@ class Malice extends CodeceptionModule
             $path = $this->kernel->locateResource('@' . $arr[0]);
             $fixtures[] = $path . 'DataFixtures/ORM/' . $arr[1];
         }
+        
+        codecept_debug("Fixtures to load:");
+        codecept_debug($fixtures);
 
         return $fixtures;
     }
